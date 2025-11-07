@@ -296,7 +296,7 @@ impl UnsizedInstruction {
     }
 
     pub fn args_with_known_size(&self, dynamic_size: usize) -> SmallVec<[ArgType; 16]> {
-        const INSTRUCTION_SIZE: usize = 0x8;
+        const INSTRUCTION_SIZE: usize = 0x4;
         let known_args_size: usize = self.args.iter().map(|a| a.size()).sum();
 
         log::debug!("dynamic instruction size: {dynamic_size}");

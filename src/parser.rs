@@ -25,7 +25,7 @@ pub enum ArgValue {
 #[derive(Debug, Clone)]
 pub struct InstructionValue {
     pub id: u16,
-    pub unk: u16,
+    pub attr: u8,
     pub name: Option<String>,
     pub args: SmallVec<[ArgValue; 16]>,
     pub code_block: CodeBlock,
@@ -52,7 +52,9 @@ fn arg_to_string(config: &ScriptConfig, arg: &ArgValue) -> Result<String, BBScri
         ArgValue::Enum(name, val) => match config.named_value_maps.get(name) {
             Some(map) => map
                 .get_by_left(val)
-                .map_or(Ok(format!("{}", *val as i32)), |name| Ok(format!("({name})"))),
+                .map_or(Ok(format!("{}", *val as i32)), |name| {
+                    Ok(format!("({name})"))
+                }),
             None => return Err(BBScriptError::BadEnumReference(name.clone())),
         },
     }
@@ -80,7 +82,7 @@ impl ScriptConfig {
             };
 
             out.write_fmt(format_args!("{}: ", instruction_name))?;
-            out.write_fmt(format_args!("{}, ", instruction.unk))?;
+            out.write_fmt(format_args!("{}, ", instruction.attr))?;
 
             let mut args = instruction.args.iter().peekable();
             while let Some(arg) = args.next() {
@@ -194,7 +196,7 @@ impl ScriptConfig {
 
         let instruction = InstructionValue {
             id: instruction_id,
-            unk: unk,
+            attr: 0,
             name: instruction_name,
             args,
             code_block: instruction.code_block,
@@ -212,10 +214,11 @@ impl ScriptConfig {
         log::debug!("offset {:#X} from end of file", input.remaining());
 
         let instruction_id = input.get_u16_le();
-        let instruction_size = input.get_u32_le();
+        let instruction_attr = input.get_u8();
+        let instruction_size = input.get_u8() * 4;
 
         log::info!(
-            "finding info for instruction with ID {instruction_id} and size {instruction_size}"
+            "finding info for instruction with ID {instruction_id}, attribute {instruction_attr}, and size {instruction_size}"
         );
 
         let instruction = if let Some(instruction) = id_map.get(&instruction_id) {
@@ -239,7 +242,7 @@ impl ScriptConfig {
 
         let instruction = InstructionValue {
             id: instruction_id,
-            unk: 0,
+            attr: instruction_attr,
             name: instruction_name,
             args,
             code_block: instruction.code_block,

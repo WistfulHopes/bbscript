@@ -346,7 +346,7 @@
             270: "INPUT_BLOCKING_XRD",
             271: "INPUT_5_TAP_4_TAP_6_LONG",
         },
-        "STATE_NAME": {
+        "HASHED_NAME": {
             3196052715: "PreInit",
             617471793: "MatchInit",
             2989257067: "MatchInit2",
@@ -565,13 +565,13 @@
             2157941741: "Assault",
         },
     },
-    instructions: Sized({
+    instructions: Unsized({
         0: (
             size: 6,
             name: "beginState",
             codeBlock: Begin,
             args: [
-                Enum("STATE_NAME"),
+                Enum("HASHED_NAME"),
             ],
         ),
         1: (
@@ -631,7 +631,7 @@
             name: "beginSubroutine",
             codeBlock: Begin,
             args: [
-                Enum("STATE_NAME"),
+                Enum("HASHED_NAME"),
             ],
         ),
         9: (
@@ -646,7 +646,7 @@
             name: "callSubroutine",
             codeBlock: NoBlock,
             args: [
-                Enum("STATE_NAME"),
+                Enum("HASHED_NAME"),
             ],
         ),
         11: (
@@ -729,7 +729,7 @@
             name: "jumpToState",
             codeBlock: NoBlock,
             args: [
-                Enum("STATE_NAME"),
+                Enum("HASHED_NAME"),
             ],
         ),
         28: (
@@ -738,7 +738,7 @@
             codeBlock: NoBlock,
             args: [
                 Enum("UPON"),
-                Enum("STATE_NAME"),
+                Enum("HASHED_NAME"),
             ],
         ),
         29: (
@@ -1681,7 +1681,7 @@
             name: "createObject",
             codeBlock: NoBlock,
             args: [
-                Enum("STATE_NAME"),
+                Enum("HASHED_NAME"),
                 Number,
             ],
         ),
@@ -1690,7 +1690,7 @@
             name: "createObjectAtOffset",
             codeBlock: NoBlock,
             args: [
-                Enum("STATE_NAME"),
+                Enum("HASHED_NAME"),
                 Number,
                 Number,
             ],
@@ -1722,7 +1722,7 @@
             codeBlock: NoBlock,
             args: [
                 Number,
-                Enum("STATE_NAME"),
+                Enum("HASHED_NAME"),
                 Number,
             ],
         ),
@@ -3021,7 +3021,7 @@
             name: "canOnlyDamageWithState",
             codeBlock: NoBlock,
             args: [
-                Enum("STATE_NAME"),
+                Enum("HASHED_NAME"),
             ],
         ),
         2282: (
@@ -3436,7 +3436,7 @@
             name: "registerMove",
             codeBlock: Begin,
             args: [
-                Enum("STATE_NAME"),
+                Enum("HASHED_NAME"),
                 Enum("INPUT_TYPE"),
             ],
         ),
@@ -3522,7 +3522,7 @@
             name: "moveConditionCheckSubroutine",
             codeBlock: NoBlock,
             args: [
-                Enum("STATE_NAME"),
+                Enum("HASHED_NAME"),
             ],
         ),
         2870: (
@@ -3530,7 +3530,7 @@
             name: "addWhiffCancelOption",
             codeBlock: NoBlock,
             args: [
-                Enum("STATE_NAME"),
+                Enum("HASHED_NAME"),
             ],
         ),
         2871: (
@@ -3538,7 +3538,7 @@
             name: "addChainCancelOption",
             codeBlock: NoBlock,
             args: [
-                Enum("STATE_NAME"),
+                Enum("HASHED_NAME"),
             ],
         ),
         2878: (
@@ -3766,7 +3766,7 @@
             name: "throw",
             codeBlock: NoBlock,
             args: [
-                Enum("STATE_NAME"),
+                Enum("HASHED_NAME"),
                 Number,
                 Number,
                 Number,
@@ -3855,7 +3855,7 @@
             name: "sendSignalByName",
             codeBlock: NoBlock,
             args: [
-                Enum("STATE_NAME"),
+                Enum("HASHED_NAME"),
                 Number,
             ],
         ),
@@ -4003,7 +4003,7 @@
             name: "callPrivateFunction",
             codeBlock: NoBlock,
             args: [
-                Enum("STATE_NAME"),
+                Enum("HASHED_NAME"),
                 Number,
                 Number,
                 Number,

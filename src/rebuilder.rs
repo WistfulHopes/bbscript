@@ -1,6 +1,6 @@
 #![allow(clippy::upper_case_acronyms)]
 
-use std::{hash::Hash, collections::BTreeMap};
+use std::{collections::BTreeMap, hash::Hash};
 
 use crate::{
     error::BBScriptError,
@@ -52,16 +52,20 @@ impl JumpTable {
         table.write_u32::<LE>(jump_name).unwrap();
         table.write_u32::<LE>(offset).unwrap();
     }
-    
+
     fn sort_table(&mut self) {
         let mut new_entries: HashMap<u16, Vec<u8>> = HashMap::new();
         for id in &self.id_list {
             let mut map: BTreeMap<u32, u32> = BTreeMap::new();
             let entry = self.entries.entry(*id).or_default();
             for x in 0..entry.len() / 8 {
-                let key_bytes: [u8; 4] = entry[x * 8..x * 8 + 4].try_into().expect("slice with incorrect length");
+                let key_bytes: [u8; 4] = entry[x * 8..x * 8 + 4]
+                    .try_into()
+                    .expect("slice with incorrect length");
                 let key = u32::from_le_bytes(key_bytes);
-                let value_bytes: [u8; 4] = entry[x * 8 + 4..x * 8 + 8].try_into().expect("slice with incorrect length");
+                let value_bytes: [u8; 4] = entry[x * 8 + 4..x * 8 + 8]
+                    .try_into()
+                    .expect("slice with incorrect length");
                 let value = u32::from_le_bytes(value_bytes);
                 map.insert(key, value);
             }
@@ -81,7 +85,7 @@ impl JumpTable {
         self.sort_table();
 
         const JUMP_ENTRY_LENGTH: usize = 0x8;
-        
+
         let mut result = Vec::new();
 
         for id in &self.id_list {
@@ -146,9 +150,13 @@ fn assemble_script(program: Vec<BBSFunction>, db: &ScriptConfig) -> Result<Bytes
 
         // if dynamically sized, the function size is written after the ID
         if db.is_unsized() {
-            let instruction_dynamic_size = instruction.total_size() + 0x4;
+            match instruction.args[0] {
+                ParserValue::Number(num) => script_buffer.write_u8(num as u8).unwrap(),
+                _ => panic!("Could not find arg types!"),
+            };
+            let instruction_dynamic_size = (instruction.total_size()) / 4 - 1;
             script_buffer
-                .write_u32::<LE>(instruction_dynamic_size as u32)
+                .write_u8(instruction_dynamic_size as u8)
                 .unwrap();
         }
 
@@ -156,11 +164,11 @@ fn assemble_script(program: Vec<BBSFunction>, db: &ScriptConfig) -> Result<Bytes
             match instruction.args.get(1) {
                 Some(ParserValue::Named(name)) => {
                     let enum_name =
-                    if let Some(ArgType::Enum(name)) = instruction_info.args().get(0) {
-                        name.to_string()
-                    } else {
-                        return Err(BBScriptError::NoEnum(0, instruction_info.id()));
-                    };
+                        if let Some(ArgType::Enum(name)) = instruction_info.args().get(0) {
+                            name.to_string()
+                        } else {
+                            return Err(BBScriptError::NoEnum(0, instruction_info.id()));
+                        };
                     if let Some(value) = db.get_enum_value(enum_name.clone(), name.to_string()) {
                         jump_tables.add_table_entry(instruction_info.id(), offset, value as u32);
                     } else {
@@ -169,19 +177,14 @@ fn assemble_script(program: Vec<BBSFunction>, db: &ScriptConfig) -> Result<Bytes
                             enum_name,
                         ));
                     }
-                },
+                }
                 Some(ParserValue::Number(name)) => {
                     jump_tables.add_table_entry(instruction_info.id(), offset, *name as u32);
-                },
+                }
                 None => panic!("Entry ID function has no associated name!"),
                 _ => panic!("Entry ID function has unknown argument!"),
             }
         }
-
-        match instruction.args[0] {
-            ParserValue::Number(num) => script_buffer.write_u16::<LE>(num as u16).unwrap(),
-            _ => panic!("Could not find arg types!")
-        };
 
         for (index, arg) in instruction.args.iter().enumerate().skip(1) {
             log::trace!(
